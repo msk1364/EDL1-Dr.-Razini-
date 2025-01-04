@@ -12,36 +12,23 @@ import requests
 
 st.title('Economic Distance Level (EDL) Prediction')
 
+# URL های خام مدل‌ها برای هر نوع مصرف
 github_model_urls = {
     "Industrial": [
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Industrial/DecisionTree.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Industrial/RandomForest.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Industrial/GaussianProcess.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Industrial/SVR.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Industrial/XGBoost.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Industrial/scaler.pkl",
-
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/DecisionTree.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/RandomForest.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/GaussianProcess.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/SVR.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/XGBoost.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/scaler.pkl"
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/DecisionTree.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/RandomForest.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/GaussianProcess.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/SVR.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/XGBoost.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/scaler.pkl"
     ],
     "Residential": [
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Residential/DecisionTree.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Residential/RandomForest.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Residential/GaussianProcess.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Residential/SVR.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Residential/XGBoost.pkl",
-        "https://github.com/msk1364/EDL1-Dr.-Razini-/blob/main/models/Residential/scaler.pkl",
-        
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/DecisionTree.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/RandomForest.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/GaussianProcess.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/SVR.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/XGBoost.pkl",
-        # "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/scaler.pkl"
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/DecisionTree.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/RandomForest.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/GaussianProcess.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/SVR.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/XGBoost.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/scaler.pkl"
     ],
     "Semi-Industrial": [
         "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/DecisionTree.pkl",
@@ -52,9 +39,6 @@ github_model_urls = {
         "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/scaler.pkl"
     ]
 }
-
-
-
 
 
 
