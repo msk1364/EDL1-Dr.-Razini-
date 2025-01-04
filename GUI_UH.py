@@ -1,56 +1,68 @@
+
+
+
+import os
 import sklearn
 import streamlit as st
 import pandas as pd
 import pickle
-import os
 import requests
-import io
-import zipfile
 from sklearn.preprocessing import StandardScaler
 
 st.title('Economic Distance Level (EDL) Prediction')
 
 model_source = st.selectbox("Select Model Source:", ["GitHub", "Local Disk"])
 
+# URL های خام مدل‌ها برای هر نوع مصرف
+github_model_urls = {
+    "Industrial": [
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/DecisionTree.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/RandomForest.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/GaussianProcess.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/SVR.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/XGBoost.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Industrial/scaler.pkl"
+    ],
+    "Residential": [
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/DecisionTree.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/RandomForest.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/GaussianProcess.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/SVR.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/XGBoost.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Residential/scaler.pkl"
+    ],
+    "Semi-Industrial": [
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/DecisionTree.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/RandomForest.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/GaussianProcess.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/SVR.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/XGBoost.pkl",
+        "https://github.com/msk1364/EDL1-Dr.-Razini-/raw/refs/heads/main/models/Semi-Industrial/scaler.pkl"
+    ]
+}
+
 models = {}
 
 if model_source == "GitHub":
     @st.cache_resource
-    def load_models_from_github(repo_url):
-        try:
-            zip_url = repo_url.replace("github.com", "api.github.com/repos").replace("/tree/main", "/zipball/main")
-            response = requests.get(zip_url, stream=True)
-            response.raise_for_status()
+    def load_models_from_github(model_urls):
+        models = {}
+        for consumption_type, urls in model_urls.items():
+            models[consumption_type] = {}
+            for url in urls:
+                try:
+                    response = requests.get(url)
+                    response.raise_for_status()
+                    model_name = url.split("/")[-1][:-4]  # Extract the model name from the URL
+                    model = pickle.loads(response.content)
+                    models[consumption_type][model_name] = model
+                except requests.exceptions.RequestException as e:
+                    st.error(f"Error fetching model from GitHub: {e}")
+                except Exception as e:
+                    st.error(f"Error loading model from {url}: {e}")
+        return models
 
-            with zipfile.ZipFile(io.BytesIO(response.content)) as z:
-                for file_info in z.infolist():
-                    if file_info.filename.endswith(".pkl"):
-                        with z.open(file_info) as f:
-                            try:
-                                model = pickle.load(f)
-                                parts = file_info.filename.split('/')
-                                if len(parts) >= 3:
-                                    consumption_type = parts[-2]
-                                    model_name = parts[-1][:-4]
-                                    if consumption_type not in models:
-                                        models[consumption_type] = {}
-                                    models[consumption_type][model_name] = model
-                            except Exception as e:
-                                st.error(f"Error loading model {file_info.filename}: {e}")
-            return models
-        except requests.exceptions.RequestException as e:
-            st.error(f"Error fetching file from GitHub: {e}")
-            return None
-        except zipfile.BadZipFile as e:
-            st.error(f"Corrupted ZIP file: {e}")
-            return None
-        except Exception as e:
-            st.error(f"Unknown Error: {e}")
-            return None
-
-    repo_url = st.text_input("Enter GitHub Repository URL:", "https://github.com/username/your_repo/tree/main")
-    if repo_url:
-        models = load_models_from_github(repo_url)
+    models = load_models_from_github(github_model_urls)
 
 elif model_source == "Local Disk":
     MODELS_DIR = "models"
@@ -92,10 +104,6 @@ if models:
         features['Sensitivity/Grid Power Price ($/kWh)'] = st.slider('Grid Power Price ($/kWh); Representing Energy tariffs factors', 0.01, 0.30, 0.08, 0.01)
         features['Sensitivity/CO2 Penalty cost'] = st.slider('CO2 Penalty cost ($/ton CO2 eq.)', 0, 20, 10, 1)
         features['cost solar(kw/$)'] = st.slider('cost solar(kw/$); Representing equipment costs factors', 600, 1000, 750, 50)
-        # features['cost wind(kw/$)'] = st.slider('cost wind(kw/$)', 0.0, 10000.0, 5000.0)
-        # features['cost batry-nikel(kw/$)'] = st.slider('cost batry-nikel(kw/$)', 0.0, 10000.0, 5000.0)
-        # features['cost convertor(kw/$)'] = st.slider('cost convertor(kw/$)', 0.0, 10000.0, 5000.0)
-        # features['cost disel(kw/$)'] = st.slider('cost disel(kw/$)', 0.0, 10000.0, 5000.0)
 
         if st.button('Predict'):
             input_data = pd.DataFrame([list(features.values())], columns=list(features.keys()))
@@ -127,5 +135,3 @@ if models:
 
 else:
     st.warning("No models available to load. Please select model source correctly and/or place the model files in the correct directory.")
-
-
