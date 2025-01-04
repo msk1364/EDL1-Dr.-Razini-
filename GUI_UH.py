@@ -1,13 +1,10 @@
-
-
-
 import os
-import sklearn
+#import sklearn
 import streamlit as st
 import pandas as pd
 import pickle
 import requests
-from sklearn.preprocessing import StandardScaler
+#from sklearn.preprocessing import StandardScaler
 
 st.title('Economic Distance Level (EDL) Prediction')
 
