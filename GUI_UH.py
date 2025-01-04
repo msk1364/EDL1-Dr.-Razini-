@@ -1,3 +1,4 @@
+import urllib.request  # If installed in step 1
 import streamlit as st
 import pandas as pd
 import pickle
