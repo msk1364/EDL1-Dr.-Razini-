@@ -4,3 +4,4 @@ pickle
 requests
 io
 zipfile
+sklearn
