@@ -1,12 +1,9 @@
-import os
 import streamlit as st
 import pandas as pd
 import pickle
 import requests
 
 st.title('Economic Distance Level (EDL) Prediction')
-
-model_source = st.selectbox("Select Model Source:", ["GitHub", "Local Disk"])
 
 # URL های خام مدل‌ها برای هر نوع مصرف
 github_model_urls = {
@@ -36,54 +33,25 @@ github_model_urls = {
     ]
 }
 
-models = {}
+@st.cache_resource
+def load_models_from_github(model_urls):
+    models = {}
+    for consumption_type, urls in model_urls.items():
+        models[consumption_type] = {}
+        for url in urls:
+            try:
+                response = requests.get(url)
+                response.raise_for_status()
+                model_name = url.split("/")[-1][:-4]  # Extract the model name from the URL
+                model = pickle.loads(response.content)
+                models[consumption_type][model_name] = model
+            except requests.exceptions.RequestException as e:
+                st.error(f"Error fetching model from GitHub: {e}")
+            except Exception as e:
+                st.error(f"Error loading model from {url}: {e}")
+    return models
 
-if model_source == "GitHub":
-    @st.cache_resource
-    def load_models_from_github(model_urls):
-        models = {}
-        for consumption_type, urls in model_urls.items():
-            models[consumption_type] = {}
-            for url in urls:
-                try:
-                    response = requests.get(url)
-                    response.raise_for_status()
-                    model_name = url.split("/")[-1][:-4]  # Extract the model name from the URL
-                    model = pickle.loads(response.content)
-                    models[consumption_type][model_name] = model
-                except requests.exceptions.RequestException as e:
-                    st.error(f"Error fetching model from GitHub: {e}")
-                except Exception as e:
-                    st.error(f"Error loading model from {url}: {e}")
-        return models
-
-    models = load_models_from_github(github_model_urls)
-
-elif model_source == "Local Disk":
-    MODELS_DIR = "models"
-    for consumption_type in os.listdir(MODELS_DIR):
-        consumption_path = os.path.join(MODELS_DIR, consumption_type)
-        if os.path.isdir(consumption_path):
-            models[consumption_type] = {}
-            for filename in os.listdir(consumption_path):
-                if filename.endswith(".pkl"):
-                    model_name = filename[:-4]
-                    filepath = os.path.join(consumption_path, filename)
-                    try:
-                        with open(filepath, 'rb') as file:
-                            models[consumption_type][model_name] = pickle.load(file)
-                    except Exception as e:
-                        st.error(f"Error loading model {filename} from consumption type {consumption_type}: {e}")
-                        
-            # Load the scaler for the consumption type
-            scaler_path = os.path.join(consumption_path, "scaler.pkl")
-            if os.path.exists(scaler_path):
-                try:
-                    with open(scaler_path, 'rb') as scaler_file:
-                        scaler = pickle.load(scaler_file)
-                        models[consumption_type]['scaler'] = scaler
-                except Exception as e:
-                    st.error(f"Error loading scaler for consumption type {consumption_type}: {e}")
+models = load_models_from_github(github_model_urls)
 
 if models:
     consumption_type = st.selectbox('Select Load Type:', list(models.keys()))
@@ -129,4 +97,4 @@ if models:
         st.warning("Select a consumption type.")
 
 else:
-    st.warning("No models available to load. Please select model source correctly and/or place the model files in the correct directory.")
+    st.warning("No models available to load. Please check the GitHub URLs.")
