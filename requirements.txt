@@ -1,7 +1,0 @@
-streamlit 
-pandas 
-pickle
-requests
-io
-zipfile
-sklearn
